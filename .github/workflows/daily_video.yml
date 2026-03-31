@@ -1,0 +1,64 @@
+name: Daily Nursery Rhyme Video
+
+on:
+  schedule:
+    - cron: "0 5 * * *" # 05:00 UTC daily (adjust if needed)
+  workflow_dispatch: # Allow manual trigger for testing
+
+jobs:
+  generate-and-upload:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60 # Hard kill at 60 min — prevents runaway billing
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_PAT }} # Needed for git push in commit_tracker()
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+
+      - name: Install system dependencies (FFmpeg)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure git identity
+        run: |
+          git config --global user.email "bot@nurseryrhymesworld.com"
+          git config --global user.name "Nursery Rhyme Bot" # commit_tracker() relies on this
+
+      - name: Run pipeline
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          HF_API_TOKEN: ${{ secrets.HF_API_TOKEN }}
+          YOUTUBE_CLIENT_ID: ${{ secrets.YOUTUBE_CLIENT_ID }}
+          YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
+          YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          CHANNEL_NAME: "Nursery Rhymes World"
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_RUN_ID: ${{ github.run_id }}
+        run: python -m src.main
+
+      - name: Upload logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-logs-${{ github.run_id }}
+          path: /tmp/pipeline_*.log
+          retention-days: 7

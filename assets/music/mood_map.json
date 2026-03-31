@@ -1,0 +1,30 @@
+{
+  "lullaby": [
+    "lullaby_gentle_1.mp3",
+    "lullaby_soft_2.mp3",
+    "lullaby_bells_3.mp3",
+    "lullaby_dreams_4.mp3",
+    "lullaby_hush_5.mp3"
+  ],
+  "upbeat": [
+    "upbeat_fun_1.mp3",
+    "upbeat_bounce_2.mp3",
+    "upbeat_happy_3.mp3",
+    "upbeat_clap_4.mp3",
+    "upbeat_dance_5.mp3"
+  ],
+  "educational": [
+    "educational_playful_1.mp3",
+    "educational_bright_2.mp3",
+    "educational_curious_3.mp3",
+    "educational_learn_4.mp3",
+    "educational_explore_5.mp3"
+  ],
+  "seasonal": [
+    "seasonal_festive_1.mp3",
+    "seasonal_cheerful_2.mp3",
+    "seasonal_jingle_3.mp3",
+    "seasonal_celebrate_4.mp3",
+    "seasonal_sparkle_5.mp3"
+  ]
+}
